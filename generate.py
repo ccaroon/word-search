@@ -62,7 +62,7 @@ def valid_intersect(v1, v2):
     pass
 # ------------------------------------------------------------------------------
 def insert_word(word, loc):
-    letters = list(re.sub("\s", "", word))
+    letters = list(re.sub(r"\s", "", word))
     (row, col, dd) = loc
 
     for ltr in letters:

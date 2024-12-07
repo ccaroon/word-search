@@ -1,12 +1,11 @@
 import sys
 
-import lib.word_crawler.helpers.screen as screen
-import lib.word_crawler.items.entrance as items
-from lib.word_crawler.scenes.cut_scene import CutScene
+import word_search.adventure.items.entrance as items
+from scriptum.scene import Scene
 
-from .space import Space
+from scriptum.room import Room
 # ------------------------------------------------------------------------------
-room = Space(
+room = Room(
     "Exit",
     F"""
 Ahhhh ... Sunshine!
@@ -18,7 +17,7 @@ Ahhhh ... Sunshine!
     # north=puzzle_room
 )
 
-room.enter_scene = CutScene("Got No Time For This")
+room.enter_scene = Scene("Got No Time For This")
 room.enter_scene.add_dialogue(F"""You ain't got time for this! You head off out of the
 cavern in search of a pencil.
 """)

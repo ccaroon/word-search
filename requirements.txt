@@ -2,4 +2,4 @@ pyyaml
 adventurelib
 colorama
 pyfiglet
-scriptum
+git+https://github.com/ccaroon/scriptum.git

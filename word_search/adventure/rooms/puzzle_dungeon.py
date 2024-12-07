@@ -2,10 +2,10 @@ import pyfiglet
 
 from colorama import Fore
 
-from lib.word_crawler.inventory.object import Object
+from scriptium.object import Object
 
-from lib.grid import Grid
-from .space import Space
+from word_search.grid import Grid
+from scriptum.room import Room
 # ------------------------------------------------------------------------------
 class PuzzleDungeon:
     def __init__(self, puzzle):
@@ -49,7 +49,7 @@ class PuzzleDungeon:
                 )
                 letter_obj.parts.add(button)
 
-                room = Space(
+                room = Room(
                     F"Puzzle Room - Location[{row},{col}]",
                     F"A large, mostly empty room. There's a {letter_obj} in the center.",
                     # items=[items.lantern],

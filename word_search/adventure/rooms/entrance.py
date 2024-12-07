@@ -1,10 +1,9 @@
-import lib.word_crawler.helpers.screen as screen
-import lib.word_crawler.items.entrance as items
+import word_search.adventure.items.entrance as items
 
 from .exit import room as exit_room
-from .space import Space
+from scriptum.room import Room
 # ------------------------------------------------------------------------------
-room = Space(
+room = Room(
     "Entrance",
     F"""
 You are standing just inside the entrace to a cavern. Directly in front of you is a {items.door.state_desc()}.

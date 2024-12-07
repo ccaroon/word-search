@@ -1,15 +1,15 @@
 from adventurelib import *
 
+from colorama import Back, Fore
+
 import word_search.adventure.contexts as contexts
 from scriptum.context import Context
 
-from lib.word_crawler.inventory import INVENTORY
-from lib.word_crawler.rooms import CURRENT_ROOM
+from word_search.adventure import CURRENT_ROOM
+from word_search.adventure import GAME_MAP
+from word_search.adventure import INVENTORY
 
-from word_search.grid import Grid
-GAME_MAP = Grid()
-
-import lib.word_crawler.helpers.screen as screen
+from scriptum.screen import Screen
 # ------------------------------------------------------------------------------
 # Game
 # ------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ def map():
     loc = getattr(CURRENT_ROOM, 'location', None)
     if loc:
         old_cell = GAME_MAP.get(loc[0], loc[1])
-        GAME_MAP.set(loc[0], loc[1], screen.highlight(old_cell, fore="black", back="white"))
+        GAME_MAP.set(loc[0], loc[1], Screen.colorize_text(old_cell, fg=Fore.BLACK, bg=Back.WHITE))
         print(GAME_MAP)
         GAME_MAP.set(loc[0], loc[1], old_cell)
     else:

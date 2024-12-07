@@ -1,8 +1,6 @@
 from colorama import Fore
 
-# import lib.word_crawler.rooms
-from lib.word_crawler.inventory.object import Object
-# from lib.word_crawler.scenes.cut_scene import CutScene
+from scriptum.object import Object
 # ------------------------------------------------------------------------------
 # ITEMS - Things that can be picked up and carried in the inventory
 # ------------------------------------------------------------------------------

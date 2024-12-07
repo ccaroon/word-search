@@ -6,22 +6,22 @@ import random
 
 from colorama import Fore
 
-import lib.word_crawler.context.contexts as contexts
-from lib.word_crawler.context.context import Context
+from word_search.adventure import INVENTORY
+from word_search.adventure import GAME_MAP
 
-from lib.word_crawler.scenes.cut_scene import CutScene
+from scriptum.context import Context
 
-import lib.word_crawler.game.commands
-from lib.word_crawler.scenes.intro import scene as intro
+from scriptum.scene import Scene
 
-from lib.word_crawler.rooms.puzzle_dungeon import PuzzleDungeon
-from lib.word_crawler.rooms.entrance import room as entrance
-from lib.word_crawler.inventory.object import Object
-from lib.word_crawler.inventory import INVENTORY
+import word_search.adventure.commands
 
-from lib.word_crawler.game import GAME_MAP
+from word_search.adventure.scenes.intro import scene as intro
 
-from lib.puzzle import Puzzle
+from word_search.adventure.rooms.puzzle_dungeon import PuzzleDungeon
+from word_search.adventure.rooms.entrance import room as entrance
+from scriptum.object import Object
+
+from word_search.puzzle import Puzzle
 # ------------------------------------------------------------------------------
 def prompt():
     if Context.ACTIVE:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     first_room = dungeon.get_room(0,0)
     entrance.east = first_room
 
-    first_room.enter_scene = CutScene("Opening the Ancient Door")
+    first_room.enter_scene = Scene("Opening the Ancient Door")
     first_room.enter_scene.add_dialogue("""
     You spy a small crack in the ancient stone door and just manage to insert your fingers
     enough to get a good grip. You pull on the door with all your might and just as
