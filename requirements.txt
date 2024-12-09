@@ -3,3 +3,4 @@ adventurelib
 colorama
 pyfiglet
 git+https://github.com/ccaroon/scriptum.git
+invoke

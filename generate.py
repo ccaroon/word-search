@@ -7,75 +7,20 @@ import yaml
 
 from word_search.grid import Grid
 # ------------------------------------------------------------------------------
-ROW_PAD = 15
-COL_PAD = 15
-# ------------------------------------------------------------------------------
-# Read Word List
-# ------------------------------------------------------------------------------
-words = []
 
-word_file = sys.argv[1]
-(word_file_dir, _) = os.path.splitext(word_file)
-puzzle_name = os.path.basename(word_file_dir)
-with open(word_file, "r") as file:
-    while word := file.readline():
-        words.append(word.strip())
 
-print(F"# Words: {len(words)}")
 
-# Find max word length
-# ------------------------------------------------------------------------------
-max_word_length = 0
-for word in words:
-    l = len(word)
-    if l > max_word_length:
-        max_word_length = l
+def read_word_list(filename:str):
+    words = []
+    with open(filename, "r") as file:
+        while word := file.readline():
+            words.append(word.strip())
 
-print(F"Max Word Length: {max_word_length}")
+    return words
 
-# Generate Diagram of random letters
-# ------------------------------------------------------------------------------
-max_rows = max_word_length + ROW_PAD
-max_cols = max_word_length + COL_PAD
-diagram = Grid(max_rows, max_cols)
-diagram.fill()
 
-for r in range(max_rows):
-    for c in range(max_cols):
-        diagram.set(r, c, chr(random.randint(65,90)))
-# ------------------------------------------------------------------------------
-# def word_fits(word, loc):
-#     fits = True
 
-#     l = len(word)
-#     (row, col, dd) = loc
-#     for i in range(l):
-#         if diagram.in_bounds(row,col):
-#             (row, col) = diagram.direction_to_col_row(dd, row, col)
-#         else:
-#             fits = False
-#             break
 
-#     return fits
-# ------------------------------------------------------------------------------
-def valid_intersect(v1, v2):
-    pass
-# ------------------------------------------------------------------------------
-def insert_word(word, loc):
-    letters = list(re.sub(r"\s", "", word))
-    (row, col, dd) = loc
-
-    for ltr in letters:
-        diagram.set(row, col, ltr.upper())
-        (row, col) = diagram.direction_to_col_row(dd, row, col)
-# ------------------------------------------------------------------------------
-def random_loc():
-    row = random.randint(0, max_rows)
-    col = random.randint(0, max_cols)
-    didx = random.randint(0, len(Grid.DIRECTIONS)-1)
-    dd = Grid.DIRECTIONS[didx]
-
-    return (row, col, dd)
 
 # loc = random_loc()
 # print(loc)
@@ -161,6 +106,9 @@ output = {
 with open(F"./puzzles/{puzzle_name}.yml", "w") as file:
     yaml.safe_dump(output, file)
 
+
+
+if __name__ == "__main__":
 
 
 
