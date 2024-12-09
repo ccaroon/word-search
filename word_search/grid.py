@@ -5,64 +5,58 @@ from word_search.position import Position
 
 class Grid:
     def __init__(self, rows=2, cols=2):
-        self.set_size(rows, cols)
+        self.resize(rows, cols)
 
-    def get(self, row, col):
-        return self._grid[row][col]
 
-    def set(self, row, col, cell):
-        self._grid[row][col] = cell
+    def get(self, pos:Position):
+        return self._grid[pos.row][pos.col]
+
+
+    def set(self, pos:Position, cell):
+        self._grid[pos.row][pos.col] = cell
+
 
     def get_row(self, row):
         return self._grid[row]
 
+
     def set_row(self, row, cells):
         self._grid[row] = cells
 
+
     def fill(self, cell=' '):
-        for row in range(self.__max_row):
+        for _ in range(self.__max_row):
             cols = []
             self._grid.append(cols)
-            for col in range(self.__max_col):
+            for _ in range(self.__max_col):
                 cols.append(cell)
 
+
+    @property
     def size(self):
         return (self.__max_row, self.__max_col)
 
-    def set_size(self, rows, cols):
+
+    def resize(self, rows, cols):
         self.__max_row = rows
         self.__max_col = cols
         self._grid = []
 
-    def location_to_vector(self, loc, length):
-        vector = set()
-        (row, col, dd) = loc
 
-        for i in range(length):
-            if self.in_bounds(row, col):
-                vector.add((row, col))
-                (row, col) = self.direction_to_col_row(dd, row, col)
-            else:
-                vector = None
-                break
+    # def valid_directions(self, pos:Position):
+    #     valid = []
+    #     directions = [Direction(code) for code in Direction.VALID_CODES]
+    #     for direction in directions:
+    #         start_pos = pos.copy()
 
-        return vector
+    #         start_pos.move(direction)
+    #         if self.in_bounds(start_pos):
+    #             valid.append(direction)
 
-
-    def valid_directions(self, pos:Position):
-        valid = []
-        directions = [Direction(code) for code in Direction.VALID_CODES]
-        for direction in directions:
-            start_pos = Position(pos.row, pos.col)
-
-            start_pos.move(direction)
-            if self.in_bounds(start_pos):
-                valid.append(direction)
-
-        return valid
+    #     return valid
 
 
-    def in_bounds(self, pos):
+    def in_bounds(self, pos:Position) -> bool:
         in_bounds = True
         if pos.row < 0 or pos.row >= self.__max_row:
             in_bounds = False
@@ -83,6 +77,7 @@ class Grid:
                 output += line.center(center) + "\n"
 
         return(output)
+
 
     def __str__(self):
         return self.display(inc_ln=False)

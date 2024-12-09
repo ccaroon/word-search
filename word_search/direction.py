@@ -1,5 +1,7 @@
+import random
+
 class Direction:
-    __OFFSET = {
+    __CODE_MAP = {
         "N":  (-1, 0),
         "NE": (-1, 1),
         "E":  (0, 1),
@@ -10,14 +12,14 @@ class Direction:
         "NW": (-1,-1)
     }
 
-    VALID_CODES = tuple(__OFFSET.keys())
+    VALID_CODES = tuple(__CODE_MAP.keys())
 
     def __init__(self, code:str):
-        if code not in self.__OFFSET:
+        if code not in self.__CODE_MAP:
             raise ValueError(f"Invalid Direction Code '{code}'")
 
         self.__code = code
-        self.__delta = self.__OFFSET.get(code)
+        self.__delta = self.__CODE_MAP.get(code)
 
 
     @property
@@ -32,6 +34,29 @@ class Direction:
     @property
     def col_delta(self):
         return self.__delta[1]
+
+
+    @classmethod
+    def random(self):
+        """
+        Pick a random direction
+
+        >>> d = Direction.random()
+        >>> isinstance(d, Direction)
+        True
+        >>> d.code in Direction.VALID_CODES
+        True
+        """
+        rand_code = random.choice(self.VALID_CODES)
+        return Direction(rand_code)
+
+
+    def copy(self):
+        return Direction(self.code)
+
+
+    def __eq__(self, other):
+        return self.code == other.code
 
 
     def __str__(self):

@@ -1,0 +1,5 @@
+ghoti
+green
+cube
+hexagon
+python
