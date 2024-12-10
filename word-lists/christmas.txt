@@ -1,4 +1,4 @@
-tree
+christmas tree
 lights
 gifts
 eggnog
@@ -23,3 +23,12 @@ tinsel
 shopping
 cookies
 hot chocolate
+noel
+caroling
+#------ hidden words -----
+@look
+@under
+@the
+@christmas
+@tree
+@skirt

@@ -1,5 +1,3 @@
-# Encapsulates some Grid logic
-
 from word_search.direction import Direction
 from word_search.position import Position
 

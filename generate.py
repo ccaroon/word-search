@@ -1,39 +1,19 @@
 #!/usr/bin/env python
-import os
-import sys
+import argparse
 
 from word_search.generator import Generator
 
-# used_vectors = []
-# def check_intersection(vector):
-#     valid = True
-#     for used_vector in used_vectors:
-#         i = vector.intersection(used_vector)
-#         if i:
-#             valid = False
-#             break
-
-#     return valid
-
-def read_word_list(filename:str):
-    words = []
-    with open(filename, "r") as file:
-        while word := file.readline():
-            words.append(word.strip())
-
-    return words
-
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-        basename = os.path.basename(filename)
-        (title, _) = os.path.splitext(basename)
-        words = read_word_list(filename)
+    parser = argparse.ArgumentParser(description="Word Search Generator")
 
-        generator = Generator(title, words)
-        generator.generate()
-        generator.display()
+    parser.add_argument("word_file", help="File with words to include in the puzzle. One word per line.")
+    parser.add_argument("--filler", default=Generator.FILLER_RANDOM_CHARS, help="What to fill the left over spaces with. Default: Random Letters")
+    parser.add_argument("--title", default=None, help="Word Search's Title")
 
-        generator.save("txt")
-    else:
-        print(f"Usage: {sys.argv[0]} <word-list-file-name>")
+    args = parser.parse_args()
+
+    generator = Generator(args.word_file, filler=args.filler, title=args.title)
+    generator.generate()
+    generator.display()
+
+    generator.save("txt")

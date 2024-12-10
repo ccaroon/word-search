@@ -1,35 +1,63 @@
+import os
 import random
 import re
 import yaml
 
 from word_search.grid import Grid
 from word_search.position import Position
-from word_search.direction import Direction
 from word_search.vector import Vector
 
 class Generator():
     ROW_PADDING = 15
     COL_PADDING = 15
     TEXT_WIDTH = 80
+
     EMPTY = " "
+    FILLER_RANDOM_CHARS = "__random-chars__"
+    HIDDEN_WORD_MARKER = "@"
 
     def __init__(self,
-        title:str,
-        word_list:list[str],
-        rows:int=None, cols:int=None
+        word_file:str,
+        rows:int=None, cols:int=None,
+        **kwargs
     ):
-        self.__title = title
-        self.__word_list = word_list
-        # self.__rows = rows
-        # self.__cols = cols
-        self.__longest_word = self.find_longest_word()
+        self.__word_file = word_file
+        self.__filler = kwargs.get("filler", self.FILLER_RANDOM_CHARS)
 
+        self.__title = kwargs.get("title")
+        if self.__title is None:
+            self.__title = self.__default_title()
+
+        self.__word_list = None
+        self.__read_word_list()
+
+        self.__longest_word = self.find_longest_word()
         if rows is None or cols is None:
             rows = len(self.__longest_word) + self.ROW_PADDING
             cols = len(self.__longest_word) + self.COL_PADDING
 
         self.__diagram = Grid(rows, cols)
         self.__diagram.fill(self.EMPTY)
+
+
+    def __read_word_list(self):
+        self.__word_list = []
+
+        with open(self.__word_file, "r") as file:
+            while line := file.readline():
+                word = line.strip()
+                if word.startswith("#"):
+                    continue
+
+                self.__word_list.append(word)
+
+        self.__word_list.sort()
+
+
+    def __default_title(self, ):
+        basename = os.path.basename(self.__word_file)
+        (title, _) = os.path.splitext(basename)
+        return title
 
 
     def find_longest_word(self):
@@ -59,7 +87,11 @@ class Generator():
 
 
     def __letter_list(self, word:str) -> list:
-        return list(re.sub(r"\s", "", word))
+        ltr_list = list(re.sub(r"\s", "", word))
+        if ltr_list[0] == self.HIDDEN_WORD_MARKER:
+            ltr_list = ltr_list[1:]
+
+        return ltr_list
 
 
     def __insert_word(self, word:str, vector:Vector):
@@ -75,12 +107,18 @@ class Generator():
             row_str = ''.join(self.__diagram.get_row(i))
             rows.append(row_str)
 
+        # Don't include words that are marked as hidden
+        word_list = list(filter(
+            lambda word: word[0] != self.HIDDEN_WORD_MARKER,
+            self.__word_list
+        ))
+
         output = {
             'title': self.__title.capitalize(),
             'author': "Craig N. Caroon",
             'difficulty': "easy",
             'diagram': rows,
-            'words': self.__word_list
+            'words': word_list
         }
 
         with open(f"{file_path}.yml", "w") as file:
@@ -99,14 +137,20 @@ class Generator():
 
             file.write("\n")
 
+            # Don't include words that are marked as hidden
+            word_list = list(filter(
+                lambda word: word[0] != self.HIDDEN_WORD_MARKER,
+                self.__word_list
+            ))
+
             per_col = 3
             max_word_length = len(self.__longest_word)
-            word_count = len(self.__word_list)
+            word_count = len(word_list)
             for i in range(0, word_count, per_col):
                 output = ""
                 for idx in range(per_col):
                     if i + idx < word_count:
-                        word = self.__word_list[i + idx]
+                        word = word_list[i + idx]
                         output += f"* {word:{max_word_length+3}}"
 
                 file.write(f"{output.center(self.TEXT_WIDTH)}\n")
@@ -136,11 +180,6 @@ class Generator():
             counter = 0
             while not word_inserted and counter < 1000:
                 counter += 1
-                # loc = random_loc()
-                # vector = self.__diagram.location_to_vector(loc, len(word))
-                # loc_str = f"{loc[0]:02}-{loc[1]:02}-{loc[2]}"
-
-
                 vector = Vector.random(
                     size[0], size[1]
                 )
@@ -148,26 +187,19 @@ class Generator():
                     self.__insert_word(word, vector)
                     word_inserted = True
 
-                # if vector and vector not in used_vectors and check_intersection(vector):
-                #     insert_word(word, loc)
-                #     used_vectors.append(vector)
-                #     word_inserted = True
-
             if not word_inserted:
                 print(F"FAIL: '{word}' not inserted.")
 
-        # Fill left-over empty spaces with random letters
-        # TODO: ^^^ this ^^^
-        for row in range(size[0]):
-            for col in range(size[1]):
-                pos = Position(row, col)
-                if self.__diagram.get(pos) == self.EMPTY:
-                    self.__diagram.set(pos, chr(random.randint(65,90)))
-
-
-
-
-
-
-
-#
+        # Fill left-over empty spaces with **something**
+        if self.__filler is not None:
+            for row in range(size[0]):
+                for col in range(size[1]):
+                    pos = Position(row, col)
+                    if self.__diagram.get(pos) == self.EMPTY:
+                        if self.__filler == self.FILLER_RANDOM_CHARS:
+                            self.__diagram.set(pos, chr(random.randint(65,90)))
+                        else:
+                            self.__diagram.set(
+                                pos,
+                                random.choice(self.__filler).upper()
+                            )
