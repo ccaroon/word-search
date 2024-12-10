@@ -8,8 +8,7 @@ from word_search.position import Position
 from word_search.vector import Vector
 
 class Generator():
-    ROW_PADDING = 15
-    COL_PADDING = 15
+    DEFAULT_PADDING = 15
     TEXT_WIDTH = 80
 
     EMPTY = " "
@@ -23,6 +22,7 @@ class Generator():
     ):
         self.__word_file = word_file
         self.__filler = kwargs.get("filler", self.FILLER_RANDOM_CHARS)
+        self.__padding = kwargs.get("padding", self.DEFAULT_PADDING)
 
         self.__title = kwargs.get("title")
         if self.__title is None:
@@ -33,8 +33,8 @@ class Generator():
 
         self.__longest_word = self.find_longest_word()
         if rows is None or cols is None:
-            rows = len(self.__longest_word) + self.ROW_PADDING
-            cols = len(self.__longest_word) + self.COL_PADDING
+            rows = len(self.__longest_word) + self.__padding
+            cols = len(self.__longest_word) + self.__padding
 
         self.__diagram = Grid(rows, cols)
         self.__diagram.fill(self.EMPTY)
