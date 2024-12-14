@@ -4,3 +4,4 @@ colorama
 pyfiglet
 git+https://github.com/ccaroon/scriptum.git
 invoke
+reportlab ~= 4.2

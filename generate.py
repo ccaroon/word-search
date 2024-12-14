@@ -10,6 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("--filler", default=Generator.FILLER_RANDOM_CHARS, help="What to fill the left over spaces with. Default: Random Letters")
     parser.add_argument("--title", default=None, help="Word Search's Title")
     parser.add_argument("--padding", type=int, default=10, help="Amount of extra room around the edges of the puzzle. Also filled with `filler`")
+    parser.add_argument("--format", type=str, default="txt", help="Format to Save As: txt|yml")
 
     args = parser.parse_args()
 
@@ -17,4 +18,4 @@ if __name__ == "__main__":
     generator.generate()
     generator.display()
 
-    generator.save("txt")
+    generator.save(args.format)

@@ -7,13 +7,26 @@ from word_search.grid import Grid
 from word_search.position import Position
 from word_search.vector import Vector
 
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+# from reportlab.lib.colors import black, white, lightgrey
+
+
 class Generator():
     DEFAULT_PADDING = 15
     TEXT_WIDTH = 80
 
+    INSERT_TRIES = 3000
+
     EMPTY = " "
     FILLER_RANDOM_CHARS = "__random-chars__"
     HIDDEN_WORD_MARKER = "@"
+
+    # PDF
+    FONT_NORMAL = "Times-Roman"
+    FONT_BOLD = "Times-Bold"
+    FONT_FIXED = "Courier"
 
     def __init__(self,
         word_file:str,
@@ -101,7 +114,7 @@ class Generator():
 
 
     def __save_yml(self, file_path):
-        (num_rows, _) = self.__diagram.size()
+        (num_rows, _) = self.__diagram.size
         rows = []
         for i in range(num_rows):
             row_str = ''.join(self.__diagram.get_row(i))
@@ -157,6 +170,52 @@ class Generator():
             file.write(divider)
 
 
+    def __save_pdf(self, file_path):
+        pdf = Canvas(
+            f"{file_path}.pdf",
+            pagesize=letter,
+            pageCompression=0
+        )
+
+        # Border - Shaded / Rounded
+        # pdf.setStrokeColorRGB(0,0,0)
+        # pdf.setFillColor(lightgrey)
+        # pdf.roundRect(3.0 * inch, 7.4 * inch, 5 * inch, 1 * inch, 10, fill=1)
+
+        # Top Title
+        pdf.setFillColorRGB(0,0,0)
+        pdf.setFont(self.FONT_NORMAL, 64)
+        pdf.drawCentredString(4.25*inch, 10*inch, self.__title.capitalize())
+
+        # Clip Art Background Image
+        photo = "/home/ccaroon/Downloads/christmas-light.png"
+        pdf.drawImage(photo, 1.50*inch, 2.75*inch, width=400, height=500)
+
+
+        # The Word Search Puzzle
+        pdf.setFont(self.FONT_FIXED, 16)
+        puzzle = self.__diagram.display(center=self.TEXT_WIDTH, inc_ln=False)
+        text_obj = pdf.beginText(2.25*inch, 7.75*inch)
+        text_obj.textLines(puzzle)
+        pdf.drawText(text_obj)
+
+        text_obj = pdf.beginText(1.5*inch, 3*inch)
+
+        # Word List
+        # Don't include words that are marked as hidden
+        word_list = list(filter(
+            lambda word: word[0] != self.HIDDEN_WORD_MARKER,
+            self.__word_list
+        ))
+        word_len = len(self.__longest_word)
+        for idx in range(0, len(word_list), 3):
+            text_obj.textLine(f"{word_list[idx]:{word_len}} {word_list[idx+1]:{word_len}} {word_list[idx+2]:{word_len}}")
+        pdf.drawText(text_obj)
+
+        pdf.showPage()
+        pdf.save()
+
+
     def save(self, file_format:str, path:str=None):
         path = "/tmp" if path is None else path
         basename = re.sub(r"\W", "-", self.__title.lower())
@@ -165,6 +224,8 @@ class Generator():
             self.__save_yml(f"{path}/{basename}")
         elif file_format in ("text", "txt"):
             self.__save_txt(f"{path}/{basename}")
+        elif file_format in ("pdf"):
+            self.__save_pdf(f"{path}/{basename}")
 
 
     def display(self):
@@ -178,7 +239,7 @@ class Generator():
             word_inserted = False
 
             counter = 0
-            while not word_inserted and counter < 1000:
+            while not word_inserted and counter < self.INSERT_TRIES:
                 counter += 1
                 vector = Vector.random(
                     size[0], size[1]

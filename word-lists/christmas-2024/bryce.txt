@@ -1,27 +1,23 @@
-christmas tree
+# Christmas Words
 lights
-gifts
+presents
 eggnog
-bow
 decorations
-ham
-winter
 santa claus
-chimney
 elves
-reindeer
 rudolph
 candy cane
-sleigh
-snow
 stockings
-star
 manger
+noel
 wisemen
 snowman
-tinsel
-shopping
 cookies
 hot chocolate
-noel
-caroling
+# --- hidden words ---
+@look
+@under
+@the
+@christmas
+@tree
+@skirt
