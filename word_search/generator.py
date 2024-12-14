@@ -27,6 +27,7 @@ class Generator():
     FONT_NORMAL = "Times-Roman"
     FONT_BOLD = "Times-Bold"
     FONT_FIXED = "Courier"
+    FONT_FIXED_BOLD = "Courier-Bold"
 
     def __init__(self,
         word_file:str,
@@ -36,6 +37,7 @@ class Generator():
         self.__word_file = word_file
         self.__filler = kwargs.get("filler", self.FILLER_RANDOM_CHARS)
         self.__padding = kwargs.get("padding", self.DEFAULT_PADDING)
+        self.__bg_image = kwargs.get("bg_image", None)
 
         self.__title = kwargs.get("title")
         if self.__title is None:
@@ -113,7 +115,7 @@ class Generator():
             vector.move()
 
 
-    def __save_yml(self, file_path):
+    def __save_yml(self, file_path, **kwargs):
         (num_rows, _) = self.__diagram.size
         rows = []
         for i in range(num_rows):
@@ -127,22 +129,22 @@ class Generator():
         ))
 
         output = {
-            'title': self.__title.capitalize(),
+            'title': self.__title,
             'author': "Craig N. Caroon",
             'difficulty': "easy",
             'diagram': rows,
             'words': word_list
         }
 
-        with open(f"{file_path}.yml", "w") as file:
+        with open(file_path, "w") as file:
             yaml.safe_dump(output, file)
 
 
-    def __save_txt(self, file_path):
+    def __save_txt(self, file_path, **kwargs):
         divider = ("-" * self.TEXT_WIDTH) + "\n"
 
-        with open(f"{file_path}.txt", "w") as file:
-            file.write(f"{self.__title.capitalize().center(self.TEXT_WIDTH)}\n")
+        with open(file_path, "w") as file:
+            file.write(f"{self.__title.center(self.TEXT_WIDTH)}\n")
             file.write(divider)
             file.write(
                 self.__diagram.display(center=self.TEXT_WIDTH, inc_ln=False)
@@ -170,9 +172,9 @@ class Generator():
             file.write(divider)
 
 
-    def __save_pdf(self, file_path):
+    def __save_pdf(self, file_path, **kwargs):
         pdf = Canvas(
-            f"{file_path}.pdf",
+            file_path,
             pagesize=letter,
             pageCompression=0
         )
@@ -182,27 +184,31 @@ class Generator():
         # pdf.setFillColor(lightgrey)
         # pdf.roundRect(3.0 * inch, 7.4 * inch, 5 * inch, 1 * inch, 10, fill=1)
 
-        # Top Title
+        # Title @ top
         pdf.setFillColorRGB(0,0,0)
         pdf.setFont(self.FONT_NORMAL, 64)
-        pdf.drawCentredString(4.25*inch, 10*inch, self.__title.capitalize())
+        pdf.drawCentredString(4.25*inch, 10*inch, self.__title)
 
         # Clip Art Background Image
-        photo = "/home/ccaroon/Downloads/christmas-light.png"
-        pdf.drawImage(photo, 1.50*inch, 2.75*inch, width=400, height=500)
-
+        if self.__bg_image:
+            pdf.drawImage(self.__bg_image,
+                1.50*inch, 2.75*inch,
+                width=400, height=500
+            )
 
         # The Word Search Puzzle
-        pdf.setFont(self.FONT_FIXED, 16)
+        pdf.setFont(self.FONT_FIXED_BOLD, 16)
         puzzle = self.__diagram.display(center=self.TEXT_WIDTH, inc_ln=False)
-        text_obj = pdf.beginText(2.25*inch, 7.75*inch)
+        nudge = kwargs.get("nudge", 0.0)
+        x_pos = (2.0 * inch) + (nudge * inch)
+        text_obj = pdf.beginText(x_pos, 7.75*inch)
         text_obj.textLines(puzzle)
         pdf.drawText(text_obj)
 
-        text_obj = pdf.beginText(1.5*inch, 3*inch)
 
         # Word List
         # Don't include words that are marked as hidden
+        text_obj = pdf.beginText(1.5*inch, 2.5*inch)
         word_list = list(filter(
             lambda word: word[0] != self.HIDDEN_WORD_MARKER,
             self.__word_list
@@ -216,16 +222,21 @@ class Generator():
         pdf.save()
 
 
-    def save(self, file_format:str, path:str=None):
-        path = "/tmp" if path is None else path
-        basename = re.sub(r"\W", "-", self.__title.lower())
+    def save(self, path:str, **kwargs):
+        (_, file_format) = os.path.splitext(path)
 
-        if file_format in ("yaml","yml"):
-            self.__save_yml(f"{path}/{basename}")
-        elif file_format in ("text", "txt"):
-            self.__save_txt(f"{path}/{basename}")
-        elif file_format in ("pdf"):
-            self.__save_pdf(f"{path}/{basename}")
+        outfile = path
+        if path is None:
+            path = "/tmp" if path is None else path
+            basename = re.sub(r"\W", "-", self.__title.lower())
+            outfile = f"{path}/{basename}.{file_format}"
+
+        if file_format in (".yaml",".yml"):
+            self.__save_yml(outfile, **kwargs)
+        elif file_format in (".text", ".txt"):
+            self.__save_txt(outfile, **kwargs)
+        elif file_format in (".pdf"):
+            self.__save_pdf(outfile, **kwargs)
 
 
     def display(self):
